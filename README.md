@@ -7,19 +7,19 @@
 # Teslo API
 
 1. Clonar Proyecto
-2. ```bash $ npm install ```
+2. ```bash npm install ```
 
 3. Clonar el archivo ```.env.example``` y renombrarlo a ```.env```
 4. Configurar las variables de entorno
 
 5. Levantar la base de datos
 ```bash
-$ docker-compose up -d
-```
+docker-compose up -d
+```docd
 6. Ejecutar SEED
 ```
 http://localhost:3000/api/seed
 ```
 
-7. Levantar: ```$ npm run start:dev ```
+7. Levantar: ```npm run start:dev ```
 
