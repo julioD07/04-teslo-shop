@@ -15,11 +15,12 @@
 5. Levantar la base de datos
 ```bash
 docker-compose up -d
-```docd
-6. Ejecutar SEED
+```
+6. Levantar: ```npm run start:dev ```
+
+7. Ejecutar SEED
 ```
 http://localhost:3000/api/seed
 ```
 
-7. Levantar: ```npm run start:dev ```
 
