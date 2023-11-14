@@ -10,6 +10,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { EncriptarPassAdapter } from './adapters/encriptar-pass.adapter';
 
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interfaces';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,6 +22,9 @@ export class AuthService {
 
     //? Inyectamos el adaptador de encriptación de contraseñas
     private readonly encriptarPassAdapter: EncriptarPassAdapter,
+
+    //? Inyectamos el servicio para generar el token
+    private readonly jwtService: JwtService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto) {
@@ -36,7 +42,10 @@ export class AuthService {
 
       //? Retornamos el usuario creado
       delete user.password;
-      return user;
+      return {
+        ...user,
+        token: this.getJwtToken({ id: user.id }),
+      };
       //TODO Regresar el JWT del usuario
     } catch (error) {
       this.handleDBError(error);
@@ -44,7 +53,6 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-
     const { email, password } = loginUserDto;
 
     //? Buscamos al usuario en la base de datos
@@ -53,17 +61,36 @@ export class AuthService {
       select: {
         email: true,
         password: true,
-      }
+        id: true,
+      },
     });
 
     //? Si el usuario no existe, lanzamos un error
-    if (!user) throw new UnauthorizedException('Credentials are not valid (email)'); 
+    if (!user)
+      throw new UnauthorizedException('Credentials are not valid (email)');
 
-    if (!this.encriptarPassAdapter.compareSync(password, user.password)) 
+    if (!this.encriptarPassAdapter.compareSync(password, user.password))
       throw new UnauthorizedException('Credentials are not valid (password)');
 
-    return user;
+    //? Eliminamos la contraseña del usuario
+    delete user.password;
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
     //TODO Regresar el JWT del usuario
+  }
+
+  async checkAuthStatus(user: User) {
+    return {
+      ...user,
+      token: this.getJwtToken({ id: user.id }),
+    };
+  }
+
+  private getJwtToken(payload: JwtPayload) {
+    //? Generamos el token a partir del servicio
+    return this.jwtService.sign(payload);
   }
 
   private handleDBError(error: any): never {

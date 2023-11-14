@@ -7,11 +7,14 @@ import { AuthController } from './auth.controller';
 import { User } from './entities/user.entity';
 import { EncriptarPassAdapter } from './adapters/encriptar-pass.adapter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService, EncriptarPassAdapter],
+  providers: [AuthService, EncriptarPassAdapter, JwtStrategy],
   imports: [
+    ConfigModule,
+
     TypeOrmModule.forFeature([User]),
     PassportModule.register({
       defaultStrategy: 'jwt',
@@ -34,13 +37,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       },
     }),
 
-    // JwtModule.register({
-    //   secret: process.env.JWT_SECRET,
-    //   signOptions: {
-    //     expiresIn: '2h',
-    //   },
-    // }),
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, JwtStrategy, PassportModule, JwtModule],
 })
 export class AuthModule {}
