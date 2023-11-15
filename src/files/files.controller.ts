@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Controller,
   Get,
-  Injectable,
   Param,
   Post,
   Res,
@@ -16,7 +15,9 @@ import { diskStorage } from 'multer';
 import { fileNmer } from './helpers/file.Namer.helper';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Files')
 @Controller('files')
 export class FilesController {
   constructor(
